@@ -42,11 +42,11 @@ Run the application for example as follows:
  Point your browser to http://localhost
  After you click the link you will be taken to the Abn Amro consent page:
  
- ![Abnamro Sandbox Consent](Abnamro Sandbox Consent Page.png)
+ ![Abnamro Sandbox Consent](Abnamro%20Sandbox%20Consent%20Page.png)
  
  After selecting an account you should see something like this:
  
- ![Abnamro Accounts](Abnamro Sample Account Page.png)
+ ![Abnamro Accounts](Abnamro%20Sample%20Account%20Page.png)
  
  
  Note that https is required. In the example here I have used a self-signed certificate for the https server, and therefore the browser gives a warning.
