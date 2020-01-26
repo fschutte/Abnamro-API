@@ -25,9 +25,11 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.sessions.*
 import io.ktor.util.KtorExperimentalAPI
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import nl.brachio.abnamro.service.*
+import nl.brachio.abnamro.service.AbnamroRequestService
+import nl.brachio.abnamro.service.AccountInformationService
+import nl.brachio.abnamro.service.ConsentService
+import nl.brachio.abnamro.service.TokenService
 import org.apache.http.ssl.SSLContexts
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
@@ -65,7 +67,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    logger.info("TESTJE")
+
     install(FreeMarker) {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
     }
@@ -75,7 +77,7 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.Forbidden, "No session found")
         }
         exception<Throwable> { cause ->
-            call.respond(HttpStatusCode.InternalServerError, "Oops, we got an error ${cause.message}" )
+            call.respond(HttpStatusCode.InternalServerError, "Oops, we got an error: ${cause.message}" )
         }
     }
 
@@ -132,8 +134,11 @@ fun Application.module(testing: Boolean = false) {
 
         // this is called once the user has given consent; it should contain a state and a code
         get("/auth") {
-            val state = call.parameters["state"] ?: throw BadRequestException("state parameter missing")
-            val code = call.parameters["code"] ?: throw BadRequestException("code parameter missing")
+
+            // TODO: currently only dealing with happy path; in case of error
+            //   we can expect parameters state, error, and error_description (but not code)
+            val state = call.parameters["state"] ?: throw BadRequestException("parameter 'state' missing")
+            val code = call.parameters["code"] ?: throw BadRequestException("parameter 'code' missing")
             val session = call.sessions.get<MySession>() ?: throw NoSessionException("No session")
             if (state != session.state) throw BadRequestException("state is incorrect")
 
